@@ -13,3 +13,4 @@ alter table kontrak add foreign key(job)references job(kode)on update cascade on
 alter table kontrak add foreign key(kuli)references kuli(email)on update cascade on delete cascade;
 insert into kat values('bangunan',100000,'per hari'),('listrik',50000,'per alat yang diperbaiki'),('kayu',200000,'per hari'),
 ('dekorasi',30000,'per meter persegi'),('pengairan',500000,'per instalasi');
+insert into panel_access values('admin','admin',false,'admin','admin'),('cs','cs',false,'cs','cs');
