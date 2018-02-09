@@ -6,7 +6,7 @@ create table kuli(email varchar(30)primary key,nama varchar(40)not null,nik varc
 foto text not null,alamat text not null,konfirm boolean,ket text not null,skill varchar(20)not null);
 alter table kuli add foreign key(skill)references kat(nama)on update cascade on delete cascade;
 create table job(kode varchar(33)primary key,nama varchar(40)not null,nik varchar(20)not null,alamat text not null,konfirm boolean,
-no_pe varchar(15)not null,keb varchar(20)not null,konfirmasi boolean,tgl date not null);
+no_pe varchar(15)not null,keb varchar(20)not null,konfirmasi boolean,tgl date not null,email varchar(30)not null);
 alter table job add foreign key(keb)references kat(nama)on update cascade on delete cascade;
 create table kontrak(job varchar(33)not null,kuli varchar(30)not null,sedia boolean);
 alter table kontrak add foreign key(job)references job(kode)on update cascade on delete cascade;
@@ -14,3 +14,4 @@ alter table kontrak add foreign key(kuli)references kuli(email)on update cascade
 insert into kat values('bangunan',100000,'per hari'),('listrik',50000,'per alat yang diperbaiki'),('kayu',200000,'per hari'),
 ('dekorasi',30000,'per meter persegi'),('pengairan',500000,'per instalasi');
 insert into panel_access values('admin','admin',false,'admin','admin'),('cs','cs',false,'cs','cs');
+create view terkontrak as select kuli.*,kontrak.* from kuli left join kontrak on kuli.email=kontrak.kuli union all select kuli.*,kontrak.* from kuli right join kontrak on kuli.email=kontrak.kuli;
