@@ -68,7 +68,12 @@ app.get('/',(req,res)=>{
     if(!e){
       var c = mysql.createConnection(formatMysql)
       c.query('update job set konfirm=? where kode=?', [true, data], (e,r,f)=>{
-        if(!e)c.query('select*from kuli where skill=(select keb from job where kode=?)', [data], (e,r,f)=>res.send(JSON.stringify({rusak:e,hasil:r,baris:f})))
+        if(!e)c.query('select*from kuli where skill=(select keb from job where kode=?)', [data], (e,r,f)=>{
+          res.send(JSON.stringify({rusak:e,hasil:r,baris:f}))
+          fs.unlink(req.params.md5,(e)=>{
+            if(e)console.error(e)
+          })
+        })
         else res.send(JSON.stringify({rusak:e}))
       })
       c.end()
@@ -77,7 +82,9 @@ app.get('/',(req,res)=>{
 }).post('/addKuli',(req,res)=>{
   if(req.params.job&&req.params.kuli){
     var c = mysql.createConnection(formatMysql)
-    c.query('insert into kontrak values(?,?,?)', [req.params.job, req.params.kuli, false], (e,r,f)=>res.send(JSON.stringify({rusak:e,hasil:r,baris:f})))
+    c.query('insert into kontrak values(?,?,?)', [req.params.job, req.params.kuli, false], (e,r,f)=>{
+      res.send(JSON.stringify({rusak:e,hasil:r,baris:f}))
+    })
     c.end()
   }else res.send(JSON.stringify({rusak:'harus diisi'}))
 }).get('/ikut/:job', (req,res)=>{
@@ -89,8 +96,15 @@ app.get('/',(req,res)=>{
     var c = mysql.createConnection(formatMysql)
     c.query('update kontrak set sedia=? where job=? and kuli=?', [true, req.params.job, req.params.kuli], (e,r,f)=>{
       if(!e)c.query('select distinct sedia from kontrak where job=?', [req.params.job], (e,r,f)=>{
-        if(!e&&r.length===1)c.query('update job set konfirmasi=? where kode=?', [r[0].sedia, req.params.job], (e,r,f)=>res.send(JSON.stringify({rusak:e, hasil:r, baris:f})))
-        else res.send(JSON.stringify({rusak:e}))
+        if(!e&&r.length===1){
+          c.query('update job set konfirmasi=? where kode=?', [r[0].sedia, req.params.job], (e,r,f)=>res.send(JSON.stringify({rusak:e, hasil:r, baris:f})))
+          if(r[0].sedia)c.query('select email from job where kode=?',[req.params.job],(e,r,f)=>{
+            var pesan={to:r[0].email,subject:'Konfirmasi Para Pekerja',user:{name:'Sistem Bagyo',message:'para Pekerja Yang ingin Anda kontrak telah menyetujui permintaan Anda'}}
+            app.mailer.send({template:'email'},pesan,(e,m)=>{
+              if(e)console.error(e)
+            })
+          })
+        }else res.send(JSON.stringify({rusak:e}))
       })
       else res.send(JSON.stringify({rusak:e}))
     })
