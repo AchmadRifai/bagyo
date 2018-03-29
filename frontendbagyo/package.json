@@ -18,8 +18,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-	"singlePath": "rc-autocomplete --src 'node_modules/react-toolbox/components/**/*.js'",
-	"generate": "rc-autocomplete"
+    "singlePath": "rc-autocomplete --src 'node_modules/react-toolbox/components/**/*.js'",
+    "generate": "rc-autocomplete"
   },
   "devDependencies": {
     "react-autocomplete-cli": "0.0.3"
